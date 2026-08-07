@@ -22,15 +22,15 @@ jobs:
 
       - name: Check and Delete CircleCI Context
         run: |
-          if circleci context list --org-id ${{ secrets.CIRCLECI_ORG_ID }} | grep -q "checkincontext"; then
-            circleci context delete --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext --force
+          if circleci context list github ${{ secrets.CIRCLECI_ORG_ID }} | grep -q "checkincontext"; then
+            circleci context delete github ${{ secrets.CIRCLECI_ORG_ID }} checkincontext --force
           else
             echo "Context does not exist, skipping deletion"
           fi
 
       - name: Create CircleCI Context
         run: |
-          circleci context create --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext
+          circleci context create github ${{ secrets.CIRCLECI_ORG_ID }} checkincontext
 
       - name: Migrate Secrets to CircleCI Context
         env:
@@ -44,7 +44,7 @@ jobs:
             # Check if the secret value is not empty
             if [ -n "$secret_value" ]; then
               echo "Storing secret: $secret_name"
-              echo "$secret_value" | circleci context store-secret --org-id "${{ secrets.CIRCLECI_ORG_ID }}" checkincontext "${secret_name}"
+              echo "$secret_value" | circleci context store-secret github "${{ secrets.CIRCLECI_ORG_ID }}" checkincontext "${secret_name}"
             else
               echo "Skipping $secret_name: secret is empty or not set"
             fi
