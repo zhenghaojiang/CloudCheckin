@@ -84,8 +84,8 @@ workflows:
       #     context: checkincontext
       # - v2ex:
       #     context: checkincontext
-      - onepoint3acres:
-          context: checkincontext
+      # - onepoint3acres:
+      #     context: checkincontext
       # - deepflood:
       #     context: checkincontext
       # - sakurafrp:
