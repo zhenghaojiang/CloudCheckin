@@ -22,31 +22,29 @@ jobs:
 
       - name: Check and Delete CircleCI Context
         run: |
-          # 列出当前账户/默认组织下的 Contexts
-          if circleci context list | grep -q "checkincontext"; then
-            # 删除 Context 时仅传入 context 名称
-            circleci context delete checkincontext --force
+          if circleci context list --org-id ${{ secrets.CIRCLECI_ORG_ID }} | grep -q "checkincontext"; then
+            circleci context delete --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext --force
           else
             echo "Context does not exist, skipping deletion"
           fi
 
       - name: Create CircleCI Context
         run: |
-          # 创建 Context 时仅传入 context 名称
-          circleci context create checkincontext
-          
+          circleci context create --org-id ${{ secrets.CIRCLECI_ORG_ID }} checkincontext
+
       - name: Migrate Secrets to CircleCI Context
         env:
           ORG_ID: ${{ secrets.CIRCLECI_ORG_ID }}
         run: |
+          # Function to safely store a secret using temp txt file
           store_secret() {
             local secret_name=$1
             local secret_value=$2
             
+            # Check if the secret value is not empty
             if [ -n "$secret_value" ]; then
               echo "Storing secret: $secret_name"
-              # 写入 secret 时仅传入: <context-name> <secret-name>
-              echo "$secret_value" | circleci context store-secret checkincontext "${secret_name}"
+              echo "$secret_value" | circleci context store-secret --org-id "${{ secrets.CIRCLECI_ORG_ID }}" checkincontext "${secret_name}"
             else
               echo "Skipping $secret_name: secret is empty or not set"
             fi
